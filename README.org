@@ -1,0 +1,48 @@
+* Minimal graphical applications in BQN
+
+Bindings for [[https://github.com/zserge/fenster][Fenster]], providing a set of functions for displaying a
+window and setting the color of individual pixels inside.
+
+** Setup
+
+Clone the repository recursively (~git clone --recurse-submodules~)
+and run ~make~ to build the shared library. The Makefile should work
+on Linux and macOS.
+
+** API
+
+- ~OpenWindow w‿h‿t~ opens a window of width ~w~ and height ~h~, with
+  title ~t~. Returns a window handle.
+- ~CloseWindow w~ closes a window given its handle ~w~.
+- ~F _render w~ runs the function ~F~ at each coordinate of the window
+  ~w~ and set the corresponding pixel color. ~F~ should be a function
+  returning a color as an RGB triplet in the (0,1) range, and taking a
+  list of three elements ~x‿y‿t~, where ~x~ and ~y~ are the pixel
+  coordinates and ~t~ is the time.
+
+** Example
+
+See [[./example.bqn][example.bqn]].
+
+#+begin_src bqn
+f←•Import "fenster.bqn"
+
+size←500
+
+w←f.OpenWindow size‿size‿"bqn-fenster example"
+
+Rainbow←{𝕊x‿y‿t:
+  x‿y↩x‿y÷size
+  t↩(100|t)÷100
+  h←(x+y)÷2
+  f.HSVtoRGB⟨360×h,1,1⟩
+}
+
+Rainbow f._render w
+
+•Delay 3
+
+f.CloseWindow w
+#+end_src
+
+[[./example.png]]
