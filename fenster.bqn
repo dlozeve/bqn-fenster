@@ -19,14 +19,14 @@ fensterClose←FensterFFI""‿"fenster_close"‿">*:i8"
 fensterSleep←FensterFFI""‿"fenster_sleep"‿">u32"
 fensterTime←FensterFFI"u64"‿"fenster_time"
 
-fensterInit←FensterFFI"*:i8"‿"fenster_init"‿"u32"‿"u32"‿"*u8:c8"
+fensterInit←FensterFFI"*:i8"‿"fenster_init"‿"u32"‿"u32"‿"u32"‿"*u8:c8"
 fensterGetWidth←FensterFFI"u32"‿"fenster_get_width"‿">*:i8"
 fensterGetHeight←FensterFFI"u32"‿"fenster_get_height"‿">*:i8"
 fensterGetPixel←FensterFFI"u32"‿"fenster_get_pixel"‿"*:i8"‿"u32"‿"u32"
 fensterSetPixel←FensterFFI""‿"fenster_set_pixel"‿"*:i8"‿"u32"‿"u32"‿"u32"
 
 OpenWindow←{𝕊w‿h‿t:
-  f←FensterInit w‿h‿t
+  f←FensterInit⟨w,h,1+≠t,t∾@⟩
   FensterOpen f
   FensterLoop f
   f

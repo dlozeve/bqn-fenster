@@ -1,4 +1,4 @@
-f←•Import "fenster.bqn"
+f←•Import"fenster.bqn"
 
 size←500
 
