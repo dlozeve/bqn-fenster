@@ -29,3 +29,16 @@ uint32_t fenster_get_pixel(struct fenster *f, int i, int j) {
 void fenster_set_pixel(struct fenster *f, int i, int j, uint32_t color) {
   fenster_pixel(f, i, j) = color;
 }
+
+void fenster_set_array(struct fenster *f, int start_i, int start_j,
+                       int bufwidth, int bufheight,
+                       uint32_t buf[bufwidth * bufheight]) {
+  int max_i = start_i + bufwidth < f->width ? bufwidth : f->width - start_i;
+  int max_j = start_j + bufheight < f->height ? bufheight : f->height - start_j;
+  for (int i = 0; i < max_i; i++) {
+    for (int j = 0; j < max_j; j++) {
+      fenster_pixel(f, start_i + i, start_j + j) = buf[j * bufwidth + i];
+    }
+  }
+  fenster_loop(f);
+}

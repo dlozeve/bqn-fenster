@@ -1,7 +1,10 @@
 ⟨
+  FensterLoop,
   OpenWindow,
   CloseWindow,
   _render,
+  RenderArray
+  _display,
   Black,
   White,
   Gray,
@@ -10,6 +13,8 @@
   Blue,
   HSVtoRGB
 ⟩⇐
+
+## FFI functions
 
 FensterFFI←"lib.so"⊸•FFI
 
@@ -24,7 +29,12 @@ fensterGetWidth←FensterFFI"u32"‿"fenster_get_width"‿">*:i8"
 fensterGetHeight←FensterFFI"u32"‿"fenster_get_height"‿">*:i8"
 fensterGetPixel←FensterFFI"u32"‿"fenster_get_pixel"‿"*:i8"‿"u32"‿"u32"
 fensterSetPixel←FensterFFI""‿"fenster_set_pixel"‿"*:i8"‿"u32"‿"u32"‿"u32"
+fensterSetArray←FensterFFI""‿"fenster_set_array"‿"*:i8"‿"u32"‿"u32"‿"u32"‿"u32"‿"*u32"
 
+## Low-level functions
+
+# Open a window with given width, height, and title
+# Returns the window's handle.
 OpenWindow←{𝕊w‿h‿t:
   f←FensterInit⟨w,h,1+≠t,t∾@⟩
   FensterOpen f
@@ -32,23 +42,43 @@ OpenWindow←{𝕊w‿h‿t:
   f
 }
 
+# Close a window.
 CloseWindow←{𝕊f:
   FensterClose f
   FensterLoop f
 }
 
+# Render a function in the window.
+# The function should take a list x‿y of coordinates and return an r‿𝕘‿b color.
 _render←{Func _𝕣 f:
   w←FensterGetWidth f
   h←FensterGetHeight f
-  t←FensterTime⟨⟩
   {𝕊x‿y:
-    r‿g‿b←Func x‿y‿t
+    r‿g‿b←Func x‿y
     c←+´(⌽256⋆↕3)×⌊r‿g‿b×255
     FensterSetPixel f‿x‿y‿c
   }¨⥊(↕w)⋈⌜↕h
   FensterLoop f
   f
 }
+
+# Render an array directly.
+RenderArray←{buf𝕊f:
+  bufw‿bufh←≢buf
+  FensterSetArray⟨f,0,0,bufw,bufh,buf⟩
+}
+
+## High-level function
+
+# Open a window, render a function in it, and wait for the user to close it.
+_display←{Func _𝕣 w‿h:
+  win←OpenWindow w‿h‿"bqn-fenster"
+  Func _render win
+  ⊢•_while_(¬FensterLoop)win
+  CloseWindow win
+}
+
+## Utilities
 
 Black←0‿0‿0˙
 White←1‿1‿1˙
